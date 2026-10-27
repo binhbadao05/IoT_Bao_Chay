@@ -39,6 +39,14 @@ python -m venv .venv
 .\.venv\Scripts\python -m pip install -r backend\requirements.txt
 ```
 
+Then install frontend dependencies:
+
+```powershell
+cd frontend
+npm ci
+cd ..
+```
+
 3. Run Mosquitto with Docker and generate local broker password file:
 
 ```powershell
@@ -85,7 +93,13 @@ $env:PYTHONPATH='backend'
 .\.venv\Scripts\python simulator\simulate_device.py --telemetry-interval 2 --heartbeat-interval 2
 ```
 
-Or use the helper: `powershell -ExecutionPolicy Bypass -File scripts\run_demo.ps1`.
+Or run the full app in one command:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\run_demo.ps1
+```
+
+That starts Mosquitto, database migration/seed, MQTT worker, device simulator, backend API, and frontend Vite. Wait a few seconds, then open http://127.0.0.1:5173/login and sign in with `admin / Admin@123`.
 
 ## Demo through REST API
 
@@ -126,6 +140,25 @@ Then:
 ```powershell
 Invoke-RestMethod -Method Get -Uri http://localhost:5000/api/v1/alerts -Headers $headers
 ```
+
+## Automated E2E tests
+
+After `scripts\run_demo.ps1` has started the app, run the test scripts from a new PowerShell:
+
+```powershell
+cd frontend
+npm run test:e2e:api
+npm run test:e2e:ui
+npm run test:e2e:animation
+```
+
+Set `$env:RUN_QA_MUTATIONS='1'` before `test:e2e:ui` if you want UI tests that acknowledge alerts and send LED commands.
+
+Expected:
+
+- `test:e2e:api` runs backend pytest in `backend/`.
+- `test:e2e:ui` uses Playwright against `http://127.0.0.1:5173` and writes screenshots under `frontend/scripts/qa-screenshots/`.
+- `test:e2e:animation` checks ambient animation state changes and reduced-motion/no-overflow behavior.
 
 ## Key files
 

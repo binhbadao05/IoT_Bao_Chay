@@ -10,6 +10,17 @@ Expected: unit tests pass; broker integration test skips unless `RUN_MQTT_INTEGR
 
 ## Manual end-to-end evidence
 
+Automated commands after `scripts\run_demo.ps1` has started the app:
+
+```powershell
+cd frontend
+npm run test:e2e:api
+npm run test:e2e:ui
+npm run test:e2e:animation
+```
+
+For UI tests that mutate data (acknowledge alerts, send LED commands), set `$env:RUN_QA_MUTATIONS='1'` first.
+
 Commands run in this iteration:
 
 1. `docker compose up -d mosquitto` — broker started.

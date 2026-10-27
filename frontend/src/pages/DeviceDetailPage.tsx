@@ -11,8 +11,9 @@ import {
 } from 'recharts'
 import { Activity, Cpu, Gauge, Radio, RefreshCcw, Thermometer } from 'lucide-react'
 import { api } from '../lib/api'
-import { clampNumber, formatTime, relativeTime } from '../lib/utils'
-import { Card, EmptyBlock, ErrorBlock, LoadingBlock, PageHeader } from '../components/ui'
+import type { StatusTone } from '../lib/utils'
+import { clampNumber, formatTime, isSimulatedDevice, liveTone, relativeTime } from '../lib/utils'
+import { Card, EmptyBlock, ErrorBlock, LoadingBlock, PageHeader, StatusBadge } from '../components/ui'
 import { LedControl } from '../components/LedControl'
 
 export function DeviceDetailPage() {
@@ -23,12 +24,18 @@ export function DeviceDetailPage() {
     queryFn: () => api.latestTelemetry(deviceId),
     refetchInterval: 5000,
   })
-  const history = useQuery({ queryKey: ['telemetry', deviceId], queryFn: () => api.telemetry(deviceId, 80), refetchInterval: 10000 })
+  const history = useQuery({
+    queryKey: ['telemetry', deviceId],
+    queryFn: () => api.telemetry(deviceId, 80),
+    refetchInterval: 10000,
+  })
 
   if (device.isLoading) return <LoadingBlock label="Loading device" />
   if (device.isError) return <ErrorBlock message="Device detail could not be loaded." />
 
   const current = latest.data?.item
+  const deviceTone = liveTone(device.data?.connection_state, current?.received_at ?? device.data?.last_seen_at)
+  const isSimulated = device.data ? isSimulatedDevice(device.data) : false
   const historyData = [...(history.data?.items ?? [])].reverse().map((item) => ({
     time: new Date(item.received_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     temperature_c: item.temperature_c,
@@ -39,11 +46,16 @@ export function DeviceDetailPage() {
     <>
       <PageHeader
         title={device.data?.name || deviceId}
-        subtitle={`Device ${deviceId} · firmware ${device.data?.firmware_version}`}
+        subtitle={`Device ${deviceId} · firmware ${device.data?.firmware_version} · ${isSimulated ? 'Simulator' : 'Physical/API'}`}
         action={
-          <div className="flex items-center gap-2 text-sm text-pink-700">
-            <RefreshCcw size={15} />
-            Auto-refresh on
+          <div className="flex items-center gap-3">
+            <StatusBadge tone={deviceTone} live={deviceTone === 'online'}>
+              {device.data?.connection_state ?? 'UNKNOWN'}
+            </StatusBadge>
+            <div className="flex items-center gap-2 text-sm text-pink-700">
+              <RefreshCcw size={15} />
+              Auto-refresh on
+            </div>
           </div>
         }
       />
@@ -66,10 +78,10 @@ export function DeviceDetailPage() {
                       <stop offset="100%" stopColor="#ec4899" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid stroke="rgba(148,184,221,.08)" vertical={false} />
+                  <CartesianGrid stroke="rgba(190, 60, 120, 0.10)" vertical={false} />
                   <XAxis dataKey="time" tick={{ fill: '#b06c8a', fontSize: 11 }} axisLine={false} tickLine={false} minTickGap={30} />
                   <YAxis tick={{ fill: '#b06c8a', fontSize: 11 }} axisLine={false} tickLine={false} width={36} />
-                  <Tooltip contentStyle={{ background: 'rgba(9,22,38,.96)', border: '1px solid rgba(128,176,235,.22)', borderRadius: 18, color: '#eaf5ff' }} />
+                  <Tooltip contentStyle={{ background: 'rgba(255, 250, 252, 0.96)', border: '1px solid rgba(236, 72, 153, 0.22)', borderRadius: 18, color: '#4c1d3b' }} />
                   <Area type="monotone" dataKey="temperature_c" stroke="#ec4899" strokeWidth={2} fill="url(#detailTemp)" name="Temperature °C" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -104,7 +116,7 @@ function DeviceFacts({ deviceId }: { deviceId: string }) {
       <div className="grid grid-cols-2 gap-3">
         <Metric icon={Thermometer} label="Temp" value={item ? `${clampNumber(item.temperature_c)}°C` : '—'} />
         <Metric icon={Gauge} label="Humidity" value={item ? `${clampNumber(item.humidity_percent)}%` : '—'} />
-        <Metric icon={Radio} label="Connection" value={data?.connection_state ?? '—'} />
+        <Metric icon={Radio} label="Connection" value={data?.connection_state ?? '—'} tone={liveTone(data?.connection_state, item?.received_at ?? data?.last_seen_at)} live={data?.connection_state === 'ONLINE'} />
         <Metric icon={Cpu} label="Lifecycle" value={data?.lifecycle_state ?? '—'} />
       </div>
       <div className="mt-5 rounded-2xl border border-pink-900/10 bg-pink-100/40 p-3 text-xs text-pink-600">
@@ -114,14 +126,23 @@ function DeviceFacts({ deviceId }: { deviceId: string }) {
   )
 }
 
-function Metric({ icon: Icon, label, value }: { icon: typeof Activity; label: string; value: string }) {
+function Metric({ icon: Icon, label, value, tone, live = false }: { icon: typeof Activity; label: string; value: string; tone?: StatusTone; live?: boolean }) {
   return (
     <div className="rounded-2xl border border-pink-900/10 bg-pink-100/40 p-3">
       <div className="flex items-center gap-2 text-xs text-pink-600">
         <Icon size={14} />
         {label}
       </div>
-      <div className="mt-2 text-sm font-medium text-pink-950">{value}</div>
+      <div className="mt-2">
+        {tone ? <StatusBadge tone={tone} live={live}>{value}</StatusBadge> : <span className="text-sm font-medium text-pink-950">{value}</span>}
+      </div>
     </div>
   )
 }
+
+
+
+
+
+
+

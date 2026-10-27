@@ -66,7 +66,7 @@ function ThresholdEditor({
               step="0.1"
               value={values[key] ?? ''}
               onChange={(e) => setValues((prev) => ({ ...prev, [key]: Number(e.target.value) }))}
-              className="mt-2 w-full rounded-2xl border border-pink-900/10 bg-pink-100/50 px-3 py-3 text-sm text-pink-950 outline-none focus:border-pink-400/40"
+              className="field-focus mt-2 w-full rounded-2xl border border-pink-900/10 bg-pink-100/50 px-3 py-3 text-sm text-pink-950 outline-none focus:border-pink-400/40"
             />
           </label>
         ))}
@@ -82,7 +82,7 @@ function ThresholdEditor({
       <button
         onClick={() => save.mutate()}
         disabled={save.isPending}
-        className="mt-4 rounded-2xl bg-pink-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-pink-400 disabled:opacity-60"
+        className="mt-4 rounded-2xl bg-pink-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-pink-400 disabled:opacity-60"
       >
         {save.isPending ? 'Saving…' : 'Save thresholds'}
       </button>
