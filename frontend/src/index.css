@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --bg: #fff7fa;
+  --surface: rgba(255, 250, 252, 0.8);
+  --surface-strong: rgba(255, 255, 255, 0.94);
+  --line: rgba(244, 114, 182, 0.18);
+  --muted: #9f6579;
+  --cyan: #ec4899;
+  --green: #fb7185;
+  --amber: #ffc861;
+  --red: #ff6f82;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(244, 114, 182, 0.2), transparent 34rem),
+    radial-gradient(circle at 100% 10%, rgba(251, 113, 133, 0.16), transparent 28rem),
+    linear-gradient(140deg, #fff7fa 0%, #fff1f5 46%, #fdf7fb 100%);
+  color: #4c1d3b;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+}
+
+.glass {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(18px);
+}
+
+.soft-grid {
+  background-image:
+    linear-gradient(rgba(244, 114, 182, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 114, 182, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

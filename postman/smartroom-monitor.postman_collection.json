@@ -1,0 +1,113 @@
+{
+  "info": {
+    "name": "SmartRoom Monitor API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:5000/api/v1"},
+    {"key": "token", "value": ""},
+    {"key": "commandId", "value": ""},
+    {"key": "alertId", "value": ""},
+    {"key": "deviceId", "value": "sim-esp32-001"}
+  ],
+  "item": [
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"admin\",\"password\":\"Admin@123\"}"
+            },
+            "url": {"raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"]},
+            "event": [
+              {"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.environment.set('token', pm.response.json().access_token);"]}}
+            ]
+          }
+        },
+        {
+          "name": "me",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "devices",
+      "item": [
+        {
+          "name": "list devices",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/devices", "host": ["{{baseUrl}}"], "path": ["devices"]}
+          }
+        },
+        {
+          "name": "status",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/devices/{{deviceId}}/status", "host": ["{{baseUrl}}"], "path": ["devices", "{{deviceId}}", "status"]}
+          }
+        },
+        {
+          "name": "latest telemetry",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/devices/{{deviceId}}/telemetry/latest", "host": ["{{baseUrl}}"], "path": ["devices", "{{deviceId}}", "telemetry", "latest"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "commands",
+      "item": [
+        {
+          "name": "LED ON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {"mode": "raw", "raw": "{\"action\":\"ON\"}"},
+            "url": {"raw": "{{baseUrl}}/devices/{{deviceId}}/commands", "host": ["{{baseUrl}}"], "path": ["devices", "{{deviceId}}", "commands"]},
+            "event": [
+              {"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.environment.set('commandId', pm.response.json().id);"]}}
+            ]
+          }
+        },
+        {
+          "name": "get command",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/commands/{{commandId}}", "host": ["{{baseUrl}}"], "path": ["commands", "{{commandId}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "alerts",
+      "item": [
+        {
+          "name": "list alerts",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {"raw": "{{baseUrl}}/alerts", "host": ["{{baseUrl}}"], "path": ["alerts"]}
+          }
+        }
+      ]
+    }
+  ]
+}

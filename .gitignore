@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+*.sqlite3
+*.db
+instance/
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# MQTT generated secret
+broker/passwd
+
+# Firmware
+firmware/**/secrets.h
+firmware/**/config.h
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

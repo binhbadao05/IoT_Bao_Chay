@@ -1,0 +1,20 @@
+# Example ACL. This is a development simplification.
+# Real deployment should use Mosquitto Dynamic Security and per-device ACL provisioning.
+
+user backend_service
+topic readwrite smartroom/v1/devices/+/commands
+topic read smartroom/v1/devices/+/telemetry
+topic read smartroom/v1/devices/+/heartbeat
+topic read smartroom/v1/devices/+/status
+topic read smartroom/v1/devices/+/commands/ack
+topic read smartroom/v1/devices/+/config/ack
+topic readwrite smartroom/v1/devices/+/config
+
+user sim_device
+topic write smartroom/v1/devices/sim-esp32-001/telemetry
+topic write smartroom/v1/devices/sim-esp32-001/heartbeat
+topic write smartroom/v1/devices/sim-esp32-001/status
+topic read smartroom/v1/devices/sim-esp32-001/commands
+topic write smartroom/v1/devices/sim-esp32-001/commands/ack
+topic read smartroom/v1/devices/sim-esp32-001/config
+topic write smartroom/v1/devices/sim-esp32-001/config/ack
